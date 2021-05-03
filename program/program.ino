@@ -3,6 +3,7 @@
   // Pins 
   const int BUTTON_PIN = 2;
   const int ledpin = 4;
+  const int PT = 5;
   const int ARMEDPIN = 3;
   
   // Time related variables
@@ -27,7 +28,8 @@
   
     // Pin modes
     pinMode(BUTTON_PIN, INPUT_PULLUP);
-  
+
+    pinMode(PT,INPUT);
     pinMode(ledpin,OUTPUT);
     pinMode(ARMEDPIN,OUTPUT);
     pinMode(A0,INPUT);
@@ -36,11 +38,17 @@
   
   void loop()
   {
+  int buttonState = digitalRead(PT);
+
     // Warmup for Ethanol sensor
-   if(WarmUp){
+   if(WarmUp && buttonState == 1){
       delay(WarmUpTime);
       digitalWrite(ARMEDPIN,HIGH);
       WarmUp = false;
+      } 
+    if(buttonState == 0){
+       WarmUp = true;
+       digitalWrite(ARMEDPIN,LOW);
       }
   
     // Comunication between BT and Arduino
@@ -53,7 +61,7 @@
     }
     
     // read the state of the switch/button:
-    int buttonState = digitalRead(BUTTON_PIN);
+    buttonState = digitalRead(BUTTON_PIN);
   
     // Runs Lys func to take sensor reading
     if(buttonState == 0){
@@ -62,7 +70,7 @@
       // sends data to bt moduel
         if(istrue){
           // Calculates promille
-          BTSerial.println(total*0.21);
+          BTSerial.println(total);
           istrue = false;
       }
   }
@@ -93,5 +101,4 @@
     
     }
   
-   
   
